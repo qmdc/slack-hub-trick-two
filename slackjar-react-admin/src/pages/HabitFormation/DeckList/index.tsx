@@ -35,7 +35,7 @@ import {
     shareToMarket,
     getMyTags,
     type Deck,
-    type Tag
+    type Tag as TagType
 } from '../../../apis/modules/habitFormation'
 import {useNavigate} from 'react-router'
 
@@ -47,7 +47,7 @@ const DeckList: React.FC = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [decks, setDecks] = useState<Deck[]>([])
-    const [tags, setTags] = useState<Tag[]>([])
+    const [tags, setTags] = useState<TagType[]>([])
     const [keyword, setKeyword] = useState('')
     const [selectedTag, setSelectedTag] = useState<number | undefined>()
 

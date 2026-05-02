@@ -36,8 +36,8 @@ import {
     deleteCard,
     getDeckById,
     getMyTags,
-    type Card,
-    type Tag,
+    type Card as CardType,
+    type Tag as TagType,
     type Deck
 } from '../../../apis/modules/habitFormation'
 import {useNavigate, useParams} from 'react-router'
@@ -50,8 +50,8 @@ const CardList: React.FC = () => {
     const navigate = useNavigate()
     const {deckId} = useParams<{ deckId?: string }>()
     const [loading, setLoading] = useState(false)
-    const [cards, setCards] = useState<Card[]>([])
-    const [tags, setTags] = useState<Tag[]>([])
+    const [cards, setCards] = useState<CardType[]>([])
+    const [tags, setTags] = useState<TagType[]>([])
     const [deck, setDeck] = useState<Deck | null>(null)
     const [keyword, setKeyword] = useState('')
     const [selectedTag, setSelectedTag] = useState<number | undefined>()
@@ -62,8 +62,8 @@ const CardList: React.FC = () => {
 
     const [modalVisible, setModalVisible] = useState(false)
     const [previewVisible, setPreviewVisible] = useState(false)
-    const [editingCard, setEditingCard] = useState<Card | null>(null)
-    const [previewCard, setPreviewCard] = useState<Card | null>(null)
+    const [editingCard, setEditingCard] = useState<CardType | null>(null)
+    const [previewCard, setPreviewCard] = useState<CardType | null>(null)
     const [form] = Form.useForm()
 
     const tabItems: TabsProps['items'] = [
@@ -79,7 +79,7 @@ const CardList: React.FC = () => {
 
     useEffect(() => {
         loadCards()
-    }, [activeTab, currentPage, keyword, selectedTag])
+    }, [activeTab, currentPage, keyword, selectedTag, deckId])
 
     const loadData = async () => {
         setLoading(true)
@@ -144,7 +144,7 @@ const CardList: React.FC = () => {
         setModalVisible(true)
     }
 
-    const handleEdit = (card: Card) => {
+    const handleEdit = (card: CardType) => {
         setEditingCard(card)
         form.setFieldsValue({
             deckId: card.deckId,
@@ -156,7 +156,7 @@ const CardList: React.FC = () => {
         setModalVisible(true)
     }
 
-    const handlePreview = (card: Card) => {
+    const handlePreview = (card: CardType) => {
         setPreviewCard(card)
         setPreviewVisible(true)
     }
@@ -285,7 +285,7 @@ const CardList: React.FC = () => {
                 <div style={{marginTop: '16px'}}>
                     {cards.length > 0 ? (
                         <Row gutter={[16, 16]}>
-                            {cards.map((card: Card) => (
+                            {cards.map((card: CardType) => (
                                 <Col xs={24} sm={12} lg={8} xl={6} key={card.id}>
                                     <Card
                                         hoverable
