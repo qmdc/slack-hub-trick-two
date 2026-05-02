@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slack.slackjarservice.emotionchat.dao.ComfortMessageDao">
+
+    <select id="selectByEmotionType" resultType="com.slack.slackjarservice.emotionchat.entity.ComfortMessage">
+        SELECT * FROM comfort_message
+        WHERE emotion_type = #{emotionType} AND deleted = 0
+        ORDER BY priority ASC
+    </select>
+
+</mapper>

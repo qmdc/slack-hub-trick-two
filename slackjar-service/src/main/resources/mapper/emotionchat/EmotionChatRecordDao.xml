@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slack.slackjarservice.emotionchat.dao.EmotionChatRecordDao">
+
+    <select id="selectBySessionId" resultType="com.slack.slackjarservice.emotionchat.entity.EmotionChatRecord">
+        SELECT * FROM emotion_chat_record
+        WHERE session_id = #{sessionId} AND deleted = 0
+        ORDER BY create_time ASC
+    </select>
+
+    <select id="selectRecentByUserId" resultType="com.slack.slackjarservice.emotionchat.entity.EmotionChatRecord">
+        SELECT * FROM emotion_chat_record
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>
