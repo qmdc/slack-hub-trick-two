@@ -41,6 +41,7 @@ import {
     deleteTaskReminder,
     getTaskComments as fetchTaskComments
 } from '../../apis/modules/taskDashboard';
+import {pageQueryUsers, type UserInfo} from '../../apis/modules/auth';
 import styles from './index.module.scss';
 
 const {TextArea} = Input;
@@ -70,6 +71,22 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({open, taskId, onCancel
     const [reminderMessage, setReminderMessage] = useState('');
     const [editMode, setEditMode] = useState(false);
     const [editForm, setEditForm] = useState<UpdateTaskRequest>({});
+    const [userList, setUserList] = useState<UserInfo[]>([]);
+    const [userLoading, setUserLoading] = useState(false);
+
+    const fetchUserList = useCallback(async () => {
+        setUserLoading(true);
+        try {
+            const res = await pageQueryUsers({pageNo: 1, pageSize: 1000});
+            if (res.code === 200 && res.data) {
+                setUserList(res.data.list || []);
+            }
+        } catch (error) {
+            console.error('获取用户列表失败:', error);
+        } finally {
+            setUserLoading(false);
+        }
+    }, []);
 
     const fetchTaskDetail = useCallback(() => {
         if (!taskId) {
@@ -122,12 +139,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({open, taskId, onCancel
             fetchTaskDetail();
             fetchComments();
             fetchReminders();
+            fetchUserList();
             setEditMode(false);
             setNewComment('');
             setReminderDate(null);
             setReminderMessage('');
         }
-    }, [open, taskId, fetchTaskDetail, fetchComments, fetchReminders]);
+    }, [open, taskId, fetchTaskDetail, fetchComments, fetchReminders, fetchUserList]);
 
     const handleSaveEdit = () => {
         if (!taskId || !task) {
@@ -319,6 +337,18 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({open, taskId, onCancel
                                         {value: TaskPriority.HIGH, label: '高'},
                                         {value: TaskPriority.URGENT, label: '紧急'}
                                     ]}
+                                />
+                                <Select
+                                    value={editForm.assigneeId}
+                                    onChange={(v) => setEditForm({...editForm, assigneeId: v})}
+                                    style={{width: 160}}
+                                    placeholder="负责人"
+                                    loading={userLoading}
+                                    allowClear
+                                    options={userList.map(user => ({
+                                        value: user.id,
+                                        label: user.nickname
+                                    }))}
                                 />
                                 <DatePicker
                                     value={editForm.dueDate ? dayjs(editForm.dueDate) : null}

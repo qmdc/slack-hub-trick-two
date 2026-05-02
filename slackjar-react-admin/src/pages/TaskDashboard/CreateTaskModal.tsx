@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Modal,
     Form,
     Input,
     Select,
     DatePicker,
-    message
+    message,
+    Avatar
 } from 'antd';
 import type {Dayjs} from 'dayjs';
 import type {
@@ -17,6 +18,7 @@ import {
     TaskStatus,
     createTask
 } from '../../apis/modules/taskDashboard';
+import {pageQueryUsers, type UserInfo} from '../../apis/modules/auth';
 import styles from './index.module.scss';
 
 const {TextArea} = Input;
@@ -38,6 +40,28 @@ interface CreateTaskModalProps {
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({open, defaultStatus, onCancel, onSuccess}) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [userList, setUserList] = useState<UserInfo[]>([]);
+    const [userLoading, setUserLoading] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            fetchUserList();
+        }
+    }, [open]);
+
+    const fetchUserList = async () => {
+        setUserLoading(true);
+        try {
+            const res = await pageQueryUsers({pageNo: 1, pageSize: 1000});
+            if (res.code === 200 && res.data) {
+                setUserList(res.data.list || []);
+            }
+        } catch (error) {
+            console.error('获取用户列表失败:', error);
+        } finally {
+            setUserLoading(false);
+        }
+    };
 
     const handleSubmit = async () => {
         try {
@@ -138,6 +162,28 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({open, defaultStatus, o
                             {value: TaskPriority.HIGH, label: '高'},
                             {value: TaskPriority.URGENT, label: '紧急'}
                         ]}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="assigneeId"
+                    label="负责人"
+                >
+                    <Select
+                        placeholder="请选择负责人（可选）"
+                        loading={userLoading}
+                        allowClear
+                        options={userList.map(user => ({
+                            value: user.id,
+                            label: (
+                                <span style={{display: 'flex', alignItems: 'center', gap: 8}}>
+                                    <Avatar size={20} src={user.avatarUrl}>
+                                        {user.nickname?.charAt(0)}
+                                    </Avatar>
+                                    <span>{user.nickname}</span>
+                                </span>
+                            )
+                        }))}
                     />
                 </Form.Item>
 
