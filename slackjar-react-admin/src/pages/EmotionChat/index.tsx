@@ -142,9 +142,9 @@ const EmotionChat: React.FC = () => {
     };
 
     return (
-        <Layout style={{ height: '100vh' }}>
-            <Sider width={280} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
-                <div style={{ padding: '16px', borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+            <div style={{ width: 280, height: '100%', borderRight: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 100 }}>
+                <div style={{ padding: '16px', borderBottom: '1px solid #f0f0f0', flexShrink: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <h3 style={{ margin: 0 }}>情绪对话</h3>
                         <Button
@@ -158,57 +158,59 @@ const EmotionChat: React.FC = () => {
                         </Button>
                     </div>
                 </div>
-                <List
-                    dataSource={sessions}
-                    loading={sessionLoading}
-                    renderItem={session => (
-                        <List.Item
-                            key={session.id}
-                            onClick={() => handleSelectSession(session)}
-                            style={{
-                                cursor: 'pointer',
-                                padding: '12px 16px',
-                                borderLeft: currentSession?.id === session.id ? '3px solid #1890ff' : '3px solid transparent',
-                                backgroundColor: currentSession?.id === session.id ? '#f5f5f5' : 'transparent',
-                            }}
-                            extra={
-                                <Popconfirm
-                                    title="确定删除这个会话吗？"
-                                    onConfirm={() => handleDeleteSession(session.id)}
-                                    okText="确定"
-                                    cancelText="取消"
-                                >
-                                    <Button size="small" danger icon={<DeleteOutlined />} />
-                                </Popconfirm>
-                            }
-                        >
-                            <List.Item.Meta
-                                avatar={<MessageOutlined />}
-                                title={
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span>{session.sessionName}</span>
-                                        {session.lastEmotion && (
-                                            <Tooltip title={emotionLabels[session.lastEmotion]}>
-                                                {emotionIcons[session.lastEmotion]}
-                                            </Tooltip>
-                                        )}
-                                    </div>
+                <div style={{ flex: 1, overflow: 'auto' }}>
+                    <List
+                        dataSource={sessions}
+                        loading={sessionLoading}
+                        renderItem={session => (
+                            <List.Item
+                                key={session.id}
+                                onClick={() => handleSelectSession(session)}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '12px 16px',
+                                    borderLeft: currentSession?.id === session.id ? '3px solid #1890ff' : '3px solid transparent',
+                                    backgroundColor: currentSession?.id === session.id ? '#f5f5f5' : 'transparent',
+                                }}
+                                extra={
+                                    <Popconfirm
+                                        title="确定删除这个会话吗？"
+                                        onConfirm={() => handleDeleteSession(session.id)}
+                                        okText="确定"
+                                        cancelText="取消"
+                                    >
+                                        <Button size="small" danger icon={<DeleteOutlined />} />
+                                    </Popconfirm>
                                 }
-                                description={
-                                    <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
-                                        {session.lastMessage || '暂无消息'}
-                                    </div>
-                                }
-                            />
-                        </List.Item>
-                    )}
-                    style={{ overflow: 'auto', height: 'calc(100vh - 80px)' }}
-                />
-            </Sider>
-            <Content style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+                            >
+                                <List.Item.Meta
+                                    avatar={<MessageOutlined />}
+                                    title={
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span>{session.sessionName}</span>
+                                            {session.lastEmotion && (
+                                                <Tooltip title={emotionLabels[session.lastEmotion]}>
+                                                    {emotionIcons[session.lastEmotion]}
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                    }
+                                    description={
+                                        <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
+                                            {session.lastMessage || '暂无消息'}
+                                        </div>
+                                    }
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </div>
+            </div>
+
+            <div style={{ flex: 1, marginLeft: 280, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {currentSession ? (
                     <>
-                        <div style={{ padding: '16px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ padding: '16px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
                             <Avatar icon={<MessageOutlined />} />
                             <div>
                                 <h4 style={{ margin: 0 }}>{currentSession.sessionName}</h4>
@@ -260,7 +262,7 @@ const EmotionChat: React.FC = () => {
                                 </div>
                             )}
                         </div>
-                        <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0', backgroundColor: '#ffffff' }}>
+                        <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0', backgroundColor: '#ffffff', flexShrink: 0 }}>
                             <Input
                                 value={inputValue}
                                 onChange={e => setInputValue(e.target.value)}
@@ -290,8 +292,8 @@ const EmotionChat: React.FC = () => {
                         </div>
                     </div>
                 )}
-            </Content>
-        </Layout>
+            </div>
+        </div>
     );
 };
 
