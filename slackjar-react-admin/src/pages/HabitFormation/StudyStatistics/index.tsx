@@ -10,7 +10,8 @@ import {
     Tabs,
     TabsProps,
     Table,
-    TableColumnsType
+    TableColumnsType,
+    Button
 } from 'antd'
 import {
     TrophyOutlined,
@@ -18,7 +19,8 @@ import {
     CheckCircleOutlined,
     ClockCircleOutlined,
     RiseOutlined,
-    ArrowLeftOutlined
+    ArrowLeftOutlined,
+    FileTextOutlined
 } from '@ant-design/icons'
 import {useTranslation} from 'react-i18next'
 import {

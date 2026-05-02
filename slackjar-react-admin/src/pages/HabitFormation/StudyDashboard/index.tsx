@@ -25,7 +25,12 @@ import {
     ShopOutlined
 } from '@ant-design/icons'
 import {useTranslation} from 'react-i18next'
-import {getStudyDashboard, type StudyDashboard as StudyDashboardType, type Deck, type Card as CardType} from '../../../apis/modules/habitFormation'
+import {
+    getStudyDashboard,
+    type StudyDashboard as StudyDashboardType,
+    type Deck,
+    type Card as CardType
+} from '../../../apis/modules/habitFormation'
 import {useNavigate} from 'react-router'
 
 const StudyDashboard: React.FC = () => {
@@ -210,7 +215,11 @@ const StudyDashboard: React.FC = () => {
                                                         size="small"
                                                         showInfo={false}
                                                     />
-                                                    <div style={{fontSize: '11px', color: '#8c8c8c', textAlign: 'right'}}>
+                                                    <div style={{
+                                                        fontSize: '11px',
+                                                        color: '#8c8c8c',
+                                                        textAlign: 'right'
+                                                    }}>
                                                         {t('habit.masteryRate')}: {Math.round(deck.masteryRate)}%
                                                     </div>
                                                 </div>
@@ -358,7 +367,8 @@ const StudyDashboard: React.FC = () => {
                                         >
                                             {card.frontContent || t('habit.noContent')}
                                         </div>
-                                        <Tag color={card.masteryLevel >= 4 ? 'green' : card.masteryLevel >= 2 ? 'orange' : 'red'}>
+                                        <Tag
+                                            color={card.masteryLevel >= 4 ? 'green' : card.masteryLevel >= 2 ? 'orange' : 'red'}>
                                             {card.masteryLevelDesc || `Level ${card.masteryLevel}`}
                                         </Tag>
                                         {card.isImportant === 1 && (
