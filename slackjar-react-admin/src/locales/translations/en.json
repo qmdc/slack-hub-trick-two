@@ -3,6 +3,7 @@
   "loading": "Loading...",
   "menu": {
     "home": "Home",
+    "task dashboard": "Task Board",
     "account management": "Account",
     "user management": "User",
     "role management": "Role",

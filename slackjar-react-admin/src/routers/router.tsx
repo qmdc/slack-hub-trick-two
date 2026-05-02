@@ -10,6 +10,7 @@ import welcome from "./modules/welcome";
 import system from "./modules/system";
 import front from "./front/front";
 import other from "./modules/other";
+import taskDashboard from "./modules/taskDashboard";
 
 
 /**
@@ -32,6 +33,7 @@ export declare type MenuRouteObject = {
  */
 const portalRouters: MenuRouteObject[] = [
     {...welcome},   // 首页/欢迎页
+    {...taskDashboard}, // 任务看板
     {...system},    // 系统设置模块
     {...other},     // 其他模块
 ]

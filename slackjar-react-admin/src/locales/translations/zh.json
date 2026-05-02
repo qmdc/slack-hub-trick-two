@@ -3,6 +3,7 @@
   "loading": "加载中...",
   "menu": {
     "home": "首页",
+    "task dashboard": "任务看板",
     "account management": "账户管理",
     "user management": "用户管理",
     "role management": "角色管理",
