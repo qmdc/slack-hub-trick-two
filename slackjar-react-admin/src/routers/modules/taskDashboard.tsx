@@ -1,4 +1,4 @@
-import {KanbanOutlined} from "@ant-design/icons";
+import {ProjectOutlined} from "@ant-design/icons";
 import lazyLoad from "../lazyLoad";
 import React, {lazy} from "react";
 import {MenuRouteObject} from "../router";
@@ -6,7 +6,7 @@ import {MenuRouteObject} from "../router";
 const taskDashboard: MenuRouteObject = {
     path: "task-dashboard",
     label: "menu.task dashboard",
-    icon: <KanbanOutlined/>,
+    icon: <ProjectOutlined/>,
     element: lazyLoad(lazy(() => import("../../pages/TaskDashboard")))
 }
 

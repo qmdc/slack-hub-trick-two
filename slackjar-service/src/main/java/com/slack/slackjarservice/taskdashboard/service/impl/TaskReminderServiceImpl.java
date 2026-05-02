@@ -13,7 +13,7 @@ import com.slack.slackjarservice.taskdashboard.entity.TaskReminder;
 import com.slack.slackjarservice.taskdashboard.model.dto.TaskReminderDTO;
 import com.slack.slackjarservice.taskdashboard.model.request.CreateTaskReminderRequest;
 import com.slack.slackjarservice.taskdashboard.service.TaskReminderService;
-import com.slack.slackjarservice.taskdashboard.service.TaskService;
+import com.slack.slackjarservice.taskdashboard.dao.TaskDao;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -35,7 +35,7 @@ import java.util.Objects;
 public class TaskReminderServiceImpl extends ServiceImpl<TaskReminderDao, TaskReminder> implements TaskReminderService {
 
     @Resource
-    private TaskService taskService;
+    private TaskDao taskDao;
 
     @Resource
     private BackendMessagePush backendMessagePush;
@@ -43,7 +43,7 @@ public class TaskReminderServiceImpl extends ServiceImpl<TaskReminderDao, TaskRe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TaskReminderDTO createReminder(CreateTaskReminderRequest request, Long userId) {
-        Task task = taskService.getById(request.getTaskId());
+        Task task = taskDao.selectById(request.getTaskId());
         AssertUtil.notNull(task, ResponseEnum.DATA_NOT_EXISTS);
 
         TaskReminder reminder = new TaskReminder();

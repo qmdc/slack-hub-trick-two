@@ -27,7 +27,7 @@ import type {
     CreateTaskCommentRequest,
     CreateTaskReminderRequest,
     UpdateTaskRequest
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import {
     TaskPriority,
     TaskStatus,
@@ -40,7 +40,7 @@ import {
     getTaskReminders,
     deleteTaskReminder,
     getTaskComments as fetchTaskComments
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import styles from './index.module.scss';
 
 const {TextArea} = Input;

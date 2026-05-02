@@ -15,7 +15,7 @@ import com.slack.slackjarservice.taskdashboard.entity.TaskComment;
 import com.slack.slackjarservice.taskdashboard.model.dto.TaskCommentDTO;
 import com.slack.slackjarservice.taskdashboard.model.request.CreateTaskCommentRequest;
 import com.slack.slackjarservice.taskdashboard.service.TaskCommentService;
-import com.slack.slackjarservice.taskdashboard.service.TaskService;
+import com.slack.slackjarservice.taskdashboard.dao.TaskDao;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -39,7 +39,7 @@ public class TaskCommentServiceImpl extends ServiceImpl<TaskCommentDao, TaskComm
     private SysUserService sysUserService;
 
     @Resource
-    private TaskService taskService;
+    private TaskDao taskDao;
 
     @Resource
     private BackendMessagePush backendMessagePush;
@@ -47,7 +47,7 @@ public class TaskCommentServiceImpl extends ServiceImpl<TaskCommentDao, TaskComm
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TaskCommentDTO createComment(CreateTaskCommentRequest request, Long userId) {
-        Task task = taskService.getById(request.getTaskId());
+        Task task = taskDao.selectById(request.getTaskId());
         AssertUtil.notNull(task, ResponseEnum.DATA_NOT_EXISTS);
 
         TaskComment comment = new TaskComment();
