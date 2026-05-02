@@ -11,12 +11,12 @@ import type {Dayjs} from 'dayjs';
 import type {
     CreateTaskRequest,
     TaskItem
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import {
     TaskPriority,
     TaskStatus,
     createTask
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import styles from './index.module.scss';
 
 const {TextArea} = Input;

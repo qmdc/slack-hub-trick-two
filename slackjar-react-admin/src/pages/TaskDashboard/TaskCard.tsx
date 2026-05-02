@@ -2,8 +2,8 @@ import React from 'react';
 import {Avatar, Tag, Tooltip} from 'antd';
 import {ClockCircleOutlined} from '@ant-design/icons';
 import dayjs from 'dayjs';
-import type {TaskItem} from '../../../apis/modules/taskDashboard';
-import {TaskPriority} from '../../../apis/modules/taskDashboard';
+import type {TaskItem} from '../../apis/modules/taskDashboard';
+import {TaskPriority} from '../../apis/modules/taskDashboard';
 import styles from './index.module.scss';
 
 /**

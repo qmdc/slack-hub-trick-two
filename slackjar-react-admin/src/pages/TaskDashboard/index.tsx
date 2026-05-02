@@ -19,19 +19,19 @@ import type {
     BoardData,
     TaskItem,
     TaskStatus
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import {
     TaskPriority,
     TaskDashboardPushType,
     getBoardData,
     updateTaskStatus
-} from '../../../apis/modules/taskDashboard';
+} from '../../apis/modules/taskDashboard';
 import {
     socketManager,
     type SocketMessageDTO
-} from '../../../socketio';
+} from '../../socketio';
 import styles from './index.module.scss';
-import globalStyles from '../../global.module.scss';
+import globalStyles from '../global.module.scss';
 
 const {Search} = Input;
 
