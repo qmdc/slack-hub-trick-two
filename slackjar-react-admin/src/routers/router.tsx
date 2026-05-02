@@ -11,6 +11,7 @@ import system from "./modules/system";
 import front from "./front/front";
 import other from "./modules/other";
 import taskDashboard from "./modules/taskDashboard";
+import habitFormation from "./modules/habitFormation";
 
 
 /**
@@ -32,10 +33,11 @@ export declare type MenuRouteObject = {
  * 这些路由会被包裹在 CheckLogin 组件中，未登录会跳转到登录页
  */
 const portalRouters: MenuRouteObject[] = [
-    {...welcome},   // 首页/欢迎页
-    {...taskDashboard}, // 任务看板
-    {...system},    // 系统设置模块
-    {...other},     // 其他模块
+    {...welcome},           // 首页/欢迎页
+    {...taskDashboard},     // 任务看板
+    {...habitFormation},    // 习惯养成（知识卡片记忆）
+    {...system},            // 系统设置模块
+    {...other},             // 其他模块
 ]
 
 /**
