@@ -1,0 +1,385 @@
+/**
+ * 任务看板页面样式
+ */
+
+.kanbanContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.searchArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchInput {
+  width: 280px;
+}
+
+.priorityFilter {
+  width: 120px;
+}
+
+.actionArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanbanBoard {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 4px;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+.column {
+  flex: 1;
+  min-width: 320px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fa;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+
+  &.dragOver {
+    box-shadow: 0 0 0 2px #1890ff inset;
+  }
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.columnTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #262626;
+}
+
+.columnCount {
+  padding: 2px 8px;
+  background: #e6f7ff;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.columnTasks {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+.taskCard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &.dragging {
+    opacity: 0.8;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.taskPriority {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 8px 8px 0 0;
+}
+
+.priorityLow {
+  background: #52c41a;
+}
+
+.priorityMedium {
+  background: #1890ff;
+}
+
+.priorityHigh {
+  background: #faad14;
+}
+
+.priorityUrgent {
+  background: #ff4d4f;
+}
+
+.taskContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.taskTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.taskDescription {
+  font-size: 12px;
+  color: #8c8c8c;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.taskAssignee {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.taskDueDate {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.overdue {
+  color: #ff4d4f;
+}
+
+.dueSoon {
+  color: #faad14;
+}
+
+.priorityTag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.priorityTagLow {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.priorityTagMedium {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.priorityTagHigh {
+  background: #fffbe6;
+  color: #faad14;
+}
+
+.priorityTagUrgent {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* ========== 任务详情模态框样式 ========== */
+.detailModal {
+  :global(.ant-modal-content) {
+    border-radius: 12px;
+  }
+
+  :global(.ant-modal-header) {
+    border-bottom: none;
+    padding: 20px 24px;
+  }
+
+  :global(.ant-modal-title) {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  :global(.ant-modal-body) {
+    padding: 0 24px 24px;
+  }
+}
+
+.detailSection {
+  margin-bottom: 20px;
+}
+
+.detailSectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.detailLabel {
+  min-width: 80px;
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+.detailValue {
+  flex: 1;
+  font-size: 14px;
+  color: #262626;
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.commentItem {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.commentAuthor {
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.commentTime {
+  font-size: 12px;
+  color: #bfbfbf;
+}
+
+.commentText {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.6;
+}
+
+.commentInputArea {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ========== 新建任务模态框样式 ========== */
+.createModal {
+  :global(.ant-modal-content) {
+    border-radius: 12px;
+  }
+}
+
+/* ========== 拖拽占位符样式 ========== */
+.dragPlaceholder {
+  height: 80px;
+  background: rgba(24, 144, 255, 0.1);
+  border: 2px dashed #1890ff;
+  border-radius: 8px;
+}
