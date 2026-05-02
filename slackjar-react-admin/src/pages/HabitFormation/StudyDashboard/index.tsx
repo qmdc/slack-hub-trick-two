@@ -21,10 +21,11 @@ import {
     TrophyOutlined,
     ThunderboltOutlined,
     RiseOutlined,
-    HistoryOutlined
+    HistoryOutlined,
+    ShopOutlined
 } from '@ant-design/icons'
 import {useTranslation} from 'react-i18next'
-import {getStudyDashboard, type StudyDashboard as StudyDashboardType, type Deck, type Card} from '../../../apis/modules/habitFormation'
+import {getStudyDashboard, type StudyDashboard as StudyDashboardType, type Deck, type Card as CardType} from '../../../apis/modules/habitFormation'
 import {useNavigate} from 'react-router'
 
 const StudyDashboard: React.FC = () => {
@@ -337,7 +338,7 @@ const StudyDashboard: React.FC = () => {
                         style={{marginTop: '16px'}}
                     >
                         <Row gutter={[16, 16]}>
-                            {dashboard.todayReviewCards.slice(0, 4).map((card: Card) => (
+                            {dashboard.todayReviewCards.slice(0, 4).map((card: CardType) => (
                                 <Col xs={24} sm={12} lg={6} key={card.id}>
                                     <Card
                                         size="small"

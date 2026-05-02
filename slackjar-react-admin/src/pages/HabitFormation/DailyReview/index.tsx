@@ -28,7 +28,7 @@ import {
     getTodayReviewCards,
     reviewCard,
     getMyDecks,
-    type Card,
+    type Card as CardType,
     type Deck,
     type ReviewRating
 } from '../../../apis/modules/habitFormation'
@@ -38,12 +38,12 @@ const DailyReview: React.FC = () => {
     const {t} = useTranslation()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-    const [cards, setCards] = useState<Card[]>([])
+    const [cards, setCards] = useState<CardType[]>([])
     const [decks, setDecks] = useState<Deck[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [showAnswer, setShowAnswer] = useState(false)
     const [reviewStartTime, setReviewStartTime] = useState<number>(0)
-    const [completedCards, setCompletedCards] = useState<Card[]>([])
+    const [completedCards, setCompletedCards] = useState<CardType[]>([])
     const [correctCount, setCorrectCount] = useState(0)
     const [showResult, setShowResult] = useState(false)
 

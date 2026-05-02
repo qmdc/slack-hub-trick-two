@@ -24,7 +24,7 @@ import {
     getNewCards,
     getMyDecks,
     reviewCard,
-    type Card,
+    type Card as CardType,
     type Deck,
     type ReviewRating
 } from '../../../apis/modules/habitFormation'
@@ -36,12 +36,12 @@ const NewCards: React.FC = () => {
     const {t} = useTranslation()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-    const [cards, setCards] = useState<Card[]>([])
+    const [cards, setCards] = useState<CardType[]>([])
     const [decks, setDecks] = useState<Deck[]>([])
     const [selectedDeckId, setSelectedDeckId] = useState<number | undefined>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [showAnswer, setShowAnswer] = useState(false)
-    const [completedCards, setCompletedCards] = useState<Card[]>([])
+    const [completedCards, setCompletedCards] = useState<CardType[]>([])
     const [showResult, setShowResult] = useState(false)
 
     const currentCard = cards[currentIndex]

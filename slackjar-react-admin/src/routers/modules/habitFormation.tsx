@@ -63,7 +63,14 @@ const habitFormation: MenuRouteObject = {
             path: "statistics",
             label: "menu.study statistics",
             icon: <FundProjectionScreenOutlined/>,
-            element: lazyLoad(lazy(() => import("../../pages/HabitFormation/StudyStatistics")))
+            children: [
+                {
+                    path: "",
+                    label: "menu.study statistics",
+                    icon: <FundProjectionScreenOutlined/>,
+                    element: lazyLoad(lazy(() => import("../../pages/HabitFormation/StudyStatistics")))
+                }
+            ] as MenuRouteObject[]
         },
         {
             path: "market",
