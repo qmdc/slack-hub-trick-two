@@ -7,6 +7,7 @@ const taskDashboard: MenuRouteObject = {
     path: "task-dashboard",
     label: "menu.task dashboard",
     icon: <ProjectOutlined/>,
+    hidden: true,
     element: lazyLoad(lazy(() => import("../../pages/TaskDashboard")))
 }
 
