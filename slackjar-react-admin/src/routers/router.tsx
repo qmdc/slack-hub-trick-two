@@ -12,6 +12,7 @@ import front from "./front/front";
 import other from "./modules/other";
 import taskDashboard from "./modules/taskDashboard";
 import habitFormation from "./modules/habitFormation";
+import emotionChat from "./modules/emotionChat";
 
 
 /**
@@ -36,6 +37,7 @@ const portalRouters: MenuRouteObject[] = [
     {...welcome},           // 首页/欢迎页
     {...taskDashboard},     // 任务看板
     {...habitFormation},    // 习惯养成（知识卡片记忆）
+    {...emotionChat},       // 情绪感知推荐
     {...system},            // 系统设置模块
     {...other},             // 其他模块
 ]

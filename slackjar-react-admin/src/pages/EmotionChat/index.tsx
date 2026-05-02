@@ -45,7 +45,7 @@ const EmotionChat: React.FC = () => {
         try {
             setSessionLoading(true);
             const response = await getSessionList();
-            if (response.code === 0) {
+            if (response.code === 200) {
                 setSessions(response.data || []);
             }
         } catch (error) {
@@ -58,7 +58,7 @@ const EmotionChat: React.FC = () => {
     const handleCreateSession = async () => {
         try {
             const response = await createSession();
-            if (response.code === 0) {
+            if (response.code === 200) {
                 message.success('创建会话成功');
                 loadSessions();
             }
@@ -70,7 +70,7 @@ const EmotionChat: React.FC = () => {
     const handleDeleteSession = async (sessionId: number) => {
         try {
             const response = await deleteSession(sessionId);
-            if (response.code === 0) {
+            if (response.code === 200) {
                 message.success('删除会话成功');
                 if (currentSession?.id === sessionId) {
                     setCurrentSession(null);
@@ -87,7 +87,7 @@ const EmotionChat: React.FC = () => {
         setCurrentSession(session);
         try {
             const response = await getChatRecords(session.id);
-            if (response.code === 0) {
+            if (response.code === 200) {
                 setMessages(response.data || []);
             }
         } catch (error) {
@@ -116,7 +116,7 @@ const EmotionChat: React.FC = () => {
             setInputValue('');
 
             const response = await sendChatMessage(request);
-            if (response.code === 0 && response.data) {
+            if (response.code === 200 && response.data) {
                 const botMessage: ChatRecordResponse = {
                     id: Date.now() + 1,
                     message: response.data.response,

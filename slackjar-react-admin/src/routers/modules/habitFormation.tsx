@@ -13,6 +13,7 @@ const habitFormation: MenuRouteObject = {
     path: "habit-formation",
     label: "menu.habit formation",
     icon: <BookOutlined/>,
+    hidden: true,
     children: [
         {
             path: "dashboard",
