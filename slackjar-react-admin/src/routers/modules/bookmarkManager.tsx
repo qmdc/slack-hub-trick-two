@@ -7,6 +7,7 @@ const bookmarkManager: MenuRouteObject = {
     path: "bookmark-manager",
     label: "menu.bookmark manager",
     icon: <BookOutlined/>,
+    hidden: true,
     children: [
         {
             path: "bookmark-list",
