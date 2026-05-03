@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Select, Tag, message, Tabs, Spin } from 'antd';
-import { PlusOutlined, ShareAltOutlined, StarOutlined } from '@ant-design/icons';
-import MediaItemForm from './MediaItemForm';
-import MediaItemCard from './MediaItemCard';
-import ShareModal from './ShareModal';
+import React, { useState, useEffect } from 'react'
+import { Button, Select, Tag, message, Tabs, Spin } from 'antd'
+import { PlusOutlined, ShareAltOutlined, StarOutlined } from '@ant-design/icons'
+import MediaItemForm from './MediaItemForm'
+import MediaItemCard from './MediaItemCard'
+import ShareModal from './ShareModal'
 import {
     addItem,
     updateItem,
@@ -14,125 +14,125 @@ import {
     createShareLink,
     type MediaItemDTO,
     type MediaItemRequest,
-} from '../../apis/modules/mediaRecommend';
+} from '../../apis/modules/mediaRecommend'
 
-const { TabPane } = Tabs;
+const { TabPane } = Tabs
 
 const MediaRecommend: React.FC = () => {
-    const [items, setItems] = useState<MediaItemDTO[]>([]);
-    const [recommendations, setRecommendations] = useState<MediaItemDTO[]>([]);
-    const [allTags, setAllTags] = useState<string[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [formVisible, setFormVisible] = useState(false);
-    const [shareModalVisible, setShareModalVisible] = useState(false);
-    const [currentShareUrl, setCurrentShareUrl] = useState('');
-    const [editingItem, setEditingItem] = useState<MediaItemDTO | undefined>();
-    const [selectedType, setSelectedType] = useState<number | undefined>(undefined);
-    const [selectedStatus, setSelectedStatus] = useState<number | undefined>(undefined);
-    const [selectedTag, setSelectedTag] = useState<string>('');
+    const [items, setItems] = useState<MediaItemDTO[]>([])
+    const [recommendations, setRecommendations] = useState<MediaItemDTO[]>([])
+    const [allTags, setAllTags] = useState<string[]>([])
+    const [loading, setLoading] = useState(false)
+    const [formVisible, setFormVisible] = useState(false)
+    const [shareModalVisible, setShareModalVisible] = useState(false)
+    const [currentShareUrl, setCurrentShareUrl] = useState('')
+    const [editingItem, setEditingItem] = useState<MediaItemDTO | undefined>()
+    const [selectedType, setSelectedType] = useState<number | null>(null)
+    const [selectedStatus, setSelectedStatus] = useState<number | null>(null)
+    const [selectedTag, setSelectedTag] = useState<string>('')
 
     const fetchItems = async () => {
-        setLoading(true);
+        setLoading(true)
         try {
-            const response = await listItems(selectedType, selectedStatus);
-            if (response.data && response.data.code === 200) {
-                let filteredItems = response.data.data || [];
+            const response = await listItems(selectedType ?? undefined, selectedStatus ?? undefined)
+            if (response.code === 200) {
+                let filteredItems = response.data || []
                 if (selectedTag) {
-                    filteredItems = filteredItems.filter(item =>
+                    filteredItems = filteredItems.filter((item: MediaItemDTO) =>
                         item.tags && item.tags.includes(selectedTag)
-                    );
+                    )
                 }
-                setItems(filteredItems);
+                setItems(filteredItems)
             }
         } catch (error) {
-            message.error('获取列表失败');
+            message.error('获取列表失败')
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
     const fetchRecommendations = async () => {
         try {
-            const response = await getRecommendations(10);
-            if (response.data && response.data.code === 200) {
-                setRecommendations(response.data.data || []);
+            const response = await getRecommendations(10)
+            if (response.code === 200) {
+                setRecommendations(response.data || [])
             }
         } catch (error) {
-            console.error('获取推荐失败', error);
+            console.error('获取推荐失败', error)
         }
-    };
+    }
 
     const fetchTags = async () => {
         try {
-            const response = await getAllTags();
-            if (response.data && response.data.code === 200) {
-                setAllTags(response.data.data || []);
+            const response = await getAllTags()
+            if (response.code === 200) {
+                setAllTags(response.data || [])
             }
         } catch (error) {
-            console.error('获取标签失败', error);
+            console.error('获取标签失败', error)
         }
-    };
+    }
 
     useEffect(() => {
-        fetchItems();
-        fetchRecommendations();
-        fetchTags();
-    }, [selectedType, selectedStatus, selectedTag]);
+        fetchItems()
+        fetchRecommendations()
+        fetchTags()
+    }, [selectedType, selectedStatus, selectedTag])
 
     const handleAdd = () => {
-        setEditingItem(undefined);
-        setFormVisible(true);
-    };
+        setEditingItem(undefined)
+        setFormVisible(true)
+    }
 
     const handleEdit = (item: MediaItemDTO) => {
-        setEditingItem(item);
-        setFormVisible(true);
-    };
+        setEditingItem(item)
+        setFormVisible(true)
+    }
 
     const handleDelete = async (id: number) => {
         try {
-            const response = await deleteItem(id);
-            if (response.data && response.data.code === 200) {
-                message.success('删除成功');
-                fetchItems();
+            const response = await deleteItem(id)
+            if (response.code === 200) {
+                message.success('删除成功')
+                fetchItems()
             }
         } catch (error) {
-            message.error('删除失败');
+            message.error('删除失败')
         }
-    };
+    }
 
     const handleSubmit = async (request: MediaItemRequest) => {
         try {
-            let response;
+            let response
             if (request.id) {
-                response = await updateItem(request);
+                response = await updateItem(request)
             } else {
-                response = await addItem(request);
+                response = await addItem(request)
             }
-            if (response.data && response.data.code === 200) {
-                message.success(request.id ? '更新成功' : '添加成功');
-                setFormVisible(false);
-                fetchItems();
-                fetchTags();
+            if (response.code === 200) {
+                message.success(request.id ? '更新成功' : '添加成功')
+                setFormVisible(false)
+                fetchItems()
+                fetchTags()
             }
         } catch (error) {
-            message.error(request.id ? '更新失败' : '添加失败');
+            message.error(request.id ? '更新失败' : '添加失败')
         }
-    };
+    }
 
     const handleCreateShareLink = async () => {
         try {
-            const response = await createShareLink({ title: '我的书单影单' });
-            if (response.data && response.data.code === 200) {
-                setCurrentShareUrl(response.data.data?.shareUrl || '');
-                setShareModalVisible(true);
+            const response = await createShareLink({ title: '我的书单影单' })
+            if (response.code === 200) {
+                setCurrentShareUrl(response.data?.shareUrl || '')
+                setShareModalVisible(true)
             }
         } catch (error) {
-            message.error('生成分享链接失败');
+            message.error('生成分享链接失败')
         }
-    };
+    }
 
-    const getTypeLabel = (type: number) => type === 1 ? '电影' : '书籍';
+    const getTypeLabel = (type: number) => type === 1 ? '电影' : '书籍'
 
     return (
         <div style={{ padding: 24 }}>
@@ -163,7 +163,7 @@ const MediaRecommend: React.FC = () => {
                             placeholder="选择类型"
                             style={{ width: 120 }}
                             allowClear
-                            value={selectedType}
+                            value={selectedType ?? undefined}
                             onChange={(value) => setSelectedType(value)}
                         >
                             <Select.Option value={1}>电影</Select.Option>
@@ -173,7 +173,7 @@ const MediaRecommend: React.FC = () => {
                             placeholder="选择状态"
                             style={{ width: 120 }}
                             allowClear
-                            value={selectedStatus}
+                            value={selectedStatus ?? undefined}
                             onChange={(value) => setSelectedStatus(value)}
                         >
                             <Select.Option value={0}>想看</Select.Option>
@@ -258,7 +258,7 @@ const MediaRecommend: React.FC = () => {
                 shareUrl={currentShareUrl}
             />
         </div>
-    );
-};
+    )
+}
 
-export default MediaRecommend;
+export default MediaRecommend
