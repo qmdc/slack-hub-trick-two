@@ -11,7 +11,10 @@ import {
     Upload,
     Table,
     Popconfirm,
-    message
+    message,
+    Empty,
+    Result,
+    Space
 } from 'antd'
 import {
     DownloadOutlined,
@@ -20,7 +23,9 @@ import {
     EditOutlined,
     DeleteOutlined,
     SearchOutlined,
-    BookOutlined
+    BookOutlined,
+    FilterOutlined,
+    TagOutlined
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import type { ColumnType } from 'antd/es/table'
@@ -81,6 +86,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
     const [editingTag, setEditingTag] = useState<BookmarkTagDTO | null>(null)
     const [tagForm] = Form.useForm()
 
+    const [searchCount, setSearchCount] = useState<number>(0)
+    const [lastSearchTime, setLastSearchTime] = useState<number>(0)
+
     const fetchBookmarks = useCallback(async (pageNo = 1, pageSize = 10) => {
         setLoading(true)
         try {
@@ -92,12 +100,31 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 tagName: selectedTag || undefined
             }
             const res = await pageQueryBookmarks(params)
+            const currentTime = Date.now()
+            setLastSearchTime(currentTime)
+            
             if (res.code === 200 && res.data) {
-                setBookmarks(res.data.list || [])
+                const dataList = res.data.list || []
+                setBookmarks(dataList)
                 setTotal(res.data.total)
+                setSearchCount(dataList.length)
+                if (dataList.length > 0) {
+                    message.success(t('bookmark.searchSuccess', { count: dataList.length }))
+                } else if (keyword || selectedCategory || selectedTag) {
+                    message.info(t('bookmark.noSearchResults'))
+                }
+            } else {
+                setBookmarks([])
+                setTotal(0)
+                setSearchCount(0)
             }
-        } catch (error) {
-            message.error(t('common.loadFailed'))
+        } catch (error: any) {
+            console.error('Fetch bookmarks error:', error)
+            setBookmarks([])
+            setTotal(0)
+            setSearchCount(0)
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.loadFailed')
+            message.error(errorMsg)
         } finally {
             setLoading(false)
         }
@@ -132,7 +159,15 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
     }, [fetchBookmarks, fetchCategories, fetchTags])
 
     const handleSearch = () => {
-        fetchBookmarks()
+        fetchBookmarks(1)
+    }
+
+    const handleClearFilters = () => {
+        setKeyword('')
+        setSelectedCategory(undefined)
+        setSelectedTag('')
+        bookmarkForm.resetFields(['url', 'title', 'description', 'tags', 'categoryId'])
+        fetchBookmarks(1)
     }
 
     const handleAddBookmark = () => {
@@ -147,7 +182,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             url: bookmark.url,
             title: bookmark.title,
             description: bookmark.description,
-            tags: bookmark.tags,
+            tags: bookmark.tags ? bookmark.tags.split(',') : [],
             categoryId: bookmark.categoryId
         })
         setShowBookmarkModal(true)
@@ -156,11 +191,15 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
     const handleSaveBookmark = async () => {
         try {
             const values = await bookmarkForm.validateFields()
+            
+            const tagsArray = values.tags as string[] || []
+            const tagsString = tagsArray.length > 0 ? tagsArray.join(',') : undefined
+
             if (editingBookmark) {
                 const updateData: BookmarkUpdateRequest = {
-                    title: values.title,
-                    description: values.description,
-                    tags: values.tags,
+                    title: values.title || undefined,
+                    description: values.description || undefined,
+                    tags: tagsString,
                     categoryId: values.categoryId
                 }
                 await updateBookmark(editingBookmark.id, updateData)
@@ -168,9 +207,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             } else {
                 const createData: BookmarkCreateRequest = {
                     url: values.url,
-                    title: values.title,
-                    description: values.description,
-                    tags: values.tags,
+                    title: values.title || undefined,
+                    description: values.description || undefined,
+                    tags: tagsString,
                     categoryId: values.categoryId
                 }
                 await createBookmark(createData)
@@ -178,8 +217,10 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             }
             setShowBookmarkModal(false)
             fetchBookmarks()
-        } catch (error) {
-            message.error(t('common.operationFailed'))
+        } catch (error: any) {
+            console.error('Save bookmark error:', error)
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.operationFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -188,8 +229,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             await deleteBookmark(id)
             message.success(t('common.deleteSuccess'))
             fetchBookmarks()
-        } catch (error) {
-            message.error(t('common.deleteFailed'))
+        } catch (error: any) {
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.deleteFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -214,7 +256,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             const values = await categoryForm.validateFields()
             const data: BookmarkCategoryRequest = {
                 name: values.name,
-                icon: values.icon,
+                icon: values.icon || undefined,
                 sortOrder: values.sortOrder
             }
             if (editingCategory) {
@@ -226,8 +268,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             }
             setShowCategoryModal(false)
             fetchCategories()
-        } catch (error) {
-            message.error(t('common.operationFailed'))
+        } catch (error: any) {
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.operationFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -241,7 +284,8 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 fetchBookmarks()
             }
         } catch (error: any) {
-            message.error(error.response?.data?.message || t('common.deleteFailed'))
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.deleteFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -265,7 +309,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             const values = await tagForm.validateFields()
             const data: BookmarkTagRequest = {
                 name: values.name,
-                color: values.color
+                color: values.color || undefined
             }
             if (editingTag) {
                 await updateTag(editingTag.id, data)
@@ -277,7 +321,8 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             setShowTagModal(false)
             fetchTags()
         } catch (error: any) {
-            message.error(error.response?.data?.message || t('common.operationFailed'))
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.operationFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -290,8 +335,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 setSelectedTag('')
                 fetchBookmarks()
             }
-        } catch (error) {
-            message.error(t('common.deleteFailed'))
+        } catch (error: any) {
+            const errorMsg = error?.response?.data?.message || error?.message || t('common.deleteFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -309,11 +355,12 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 }))
             }
             await importBookmarks(importData)
-            message.success('导入成功')
+            message.success(t('bookmark.importSuccess'))
             fetchBookmarks()
             fetchCategories()
-        } catch (error) {
-            message.error('导入失败，请确保文件格式正确')
+        } catch (error: any) {
+            const errorMsg = error?.message || t('bookmark.importFailed')
+            message.error(errorMsg)
         }
     }
 
@@ -328,27 +375,44 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 a.download = `bookmarks_${dayjs().format('YYYYMMDD')}.json`
                 a.click()
                 URL.revokeObjectURL(url)
-                message.success('导出成功')
+                message.success(t('bookmark.exportSuccess'))
             }
-        } catch (error) {
-            message.error('导出失败')
+        } catch (error: any) {
+            const errorMsg = error?.message || t('bookmark.exportFailed')
+            message.error(errorMsg)
         }
     }
 
     const columns: ColumnType<BookmarkDTO>[] = [
         {
-            title: t('bookmark.website'),
+            title: (
+                <span className="flex items-center gap-1">
+                    <BookOutlined size={14} />
+                    {t('bookmark.website')}
+                </span>
+            ),
             dataIndex: 'title',
             key: 'title',
             ellipsis: true,
+            width: 220,
             render: (_, record) => (
                 <div className="flex items-center gap-2">
                     {record.faviconUrl && (
-                        <img src={record.faviconUrl} alt="" className="w-6 h-6 rounded" onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            (e.target as HTMLImageElement).style.display = 'none'
-                        }} />
+                        <img
+                            src={record.faviconUrl}
+                            alt=""
+                            className="w-6 h-6 rounded object-cover"
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                                (e.target as HTMLImageElement).style.display = 'none'
+                            }}
+                        />
                     )}
-                    <a href={record.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500">
+                    <a
+                        href={record.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-500 transition-colors truncate flex-1"
+                    >
                         {record.title || record.url}
                     </a>
                 </div>
@@ -359,22 +423,36 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             dataIndex: 'url',
             key: 'url',
             ellipsis: true,
-            width: 200
+            width: 250
         },
         {
-            title: t('bookmark.category'),
+            title: (
+                <span className="flex items-center gap-1">
+                    <FolderOpenOutlined size={14} />
+                    {t('bookmark.category')}
+                </span>
+            ),
             dataIndex: 'categoryName',
             key: 'categoryName',
-            render: (text) => text || '-'
+            width: 120,
+            render: (text) => text || <span className="text-gray-400">-</span>
         },
         {
-            title: t('bookmark.tags'),
+            title: (
+                <span className="flex items-center gap-1">
+                    <TagOutlined size={14} />
+                    {t('bookmark.tags')}
+                </span>
+            ),
             dataIndex: 'tags',
             key: 'tags',
+            width: 180,
             render: (text) => {
-                if (!text) return '-'
+                if (!text) return <span className="text-gray-400">-</span>
                 return text.split(',').map((tag: string, index: number) => (
-                    <Tag key={index}>{tag}</Tag>
+                    <Tag key={index} className="mr-1 mb-1">
+                        {tag}
+                    </Tag>
                 ))
             }
         },
@@ -382,74 +460,116 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
             title: t('bookmark.createTime'),
             dataIndex: 'createTime',
             key: 'createTime',
+            width: 150,
             render: (time) => dayjs(time).format('YYYY-MM-DD HH:mm')
         },
         {
             title: t('common.action'),
             key: 'action',
+            width: 120,
             render: (_, record) => (
-                <div className="flex gap-2">
+                <Space size="small">
                     <Button
                         type="text"
-                        icon={<EditOutlined />}
+                        icon={<EditOutlined size={14} />}
                         onClick={() => handleEditBookmark(record)}
+                        className="text-gray-600 hover:text-blue-500"
                     />
                     <Popconfirm
                         title={t('bookmark.confirmDelete')}
                         onConfirm={() => handleDeleteBookmark(record.id)}
+                        okText={t('common.yes')}
+                        cancelText={t('common.no')}
                     >
-                        <Button type="text" danger icon={<DeleteOutlined />} />
+                        <Button type="text" danger icon={<DeleteOutlined size={14} />} />
                     </Popconfirm>
-                </div>
+                </Space>
             )
         }
     ]
 
+    const hasActiveFilters = keyword || selectedCategory !== undefined || selectedTag
+
     return (
         <Content className="p-6">
-            <Card title={t('menu.bookmark manager')} className="mb-6">
-                <div className="flex flex-wrap gap-4 items-center">
+            <Card
+                title={
+                    <div className="flex items-center gap-2">
+                        <BookOutlined />
+                        <span>{t('menu.bookmark manager')}</span>
+                    </div>
+                }
+                className="mb-6"
+                extra={
+                    lastSearchTime > 0 && (
+                        <span className="text-sm text-gray-500">
+                            {t('bookmark.searchCount', { count: searchCount, total })}
+                        </span>
+                    )
+                }
+            >
+                <div className="flex flex-wrap items-center gap-3">
                     <Search
                         placeholder={t('bookmark.searchPlaceholder')}
                         allowClear
                         enterButton={<SearchOutlined />}
                         size="middle"
-                        style={{ width: 300 }}
+                        style={{ width: 320 }}
                         value={keyword}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value)}
                         onSearch={handleSearch}
+                        onPressEnter={handleSearch}
                     />
-                    <Select
-                        placeholder={t('bookmark.selectCategory')}
-                        allowClear
-                        style={{ width: 150 }}
-                        value={selectedCategory}
-                        onChange={(value: number | undefined) => {
-                            setSelectedCategory(value)
-                            fetchBookmarks()
-                        }}
-                    >
-                        {categories.map((cat) => (
-                            <Option key={cat.id} value={cat.id}>{cat.name}</Option>
-                        ))}
-                    </Select>
-                    <Select
-                        placeholder={t('bookmark.selectTag')}
-                        allowClear
-                        style={{ width: 150 }}
-                        value={selectedTag}
-                        onChange={(value: string) => {
-                            setSelectedTag(value)
-                            fetchBookmarks()
-                        }}
-                    >
-                        {tags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                                <span style={{ color: tag.color }}>{tag.name}</span>
-                            </Option>
-                        ))}
-                    </Select>
-                    <div className="flex gap-2 ml-auto">
+
+                    <div className="flex items-center gap-2">
+                        <Select
+                            placeholder={t('bookmark.selectCategory')}
+                            allowClear
+                            style={{ width: 160 }}
+                            value={selectedCategory}
+                            onChange={(value: number | undefined) => {
+                                setSelectedCategory(value)
+                                fetchBookmarks(1)
+                            }}
+                            showSearch
+                            optionFilterProp="children"
+                        >
+                            {categories.map((cat) => (
+                                <Option key={cat.id} value={cat.id}>{cat.name}</Option>
+                            ))}
+                        </Select>
+
+                        <Select
+                            placeholder={t('bookmark.selectTag')}
+                            allowClear
+                            style={{ width: 160 }}
+                            value={selectedTag}
+                            onChange={(value: string) => {
+                                setSelectedTag(value)
+                                fetchBookmarks(1)
+                            }}
+                            showSearch
+                            optionFilterProp="children"
+                        >
+                            {tags.map((tag) => (
+                                <Option key={tag.id} value={tag.name}>
+                                    <span style={{ color: tag.color }}>{tag.name}</span>
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+
+                    {hasActiveFilters && (
+                        <Button
+                            type="text"
+                            onClick={handleClearFilters}
+                            className="text-gray-500 hover:text-gray-700"
+                        >
+                            {t('bookmark.clearFilters')}
+                        </Button>
+                    )}
+
+                    <div className="flex items-center gap-2 ml-auto">
                         <Upload
                             accept=".json"
                             showUploadList={false}
@@ -458,66 +578,105 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                                 return false
                             }}
                         >
-                            <Button icon={<FolderOpenOutlined />}>
+                            <Button icon={<FolderOpenOutlined />} size="middle">
                                 {t('bookmark.import')}
                             </Button>
                         </Upload>
+
                         <Button
                             icon={<DownloadOutlined />}
+                            size="middle"
                             onClick={handleExport}
                         >
                             {t('bookmark.export')}
                         </Button>
+
                         <Button
                             type="primary"
                             icon={<PlusOutlined />}
+                            size="middle"
                             onClick={handleAddBookmark}
                         >
                             {t('bookmark.addBookmark')}
                         </Button>
                     </div>
                 </div>
+
+                {hasActiveFilters && (
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                        <FilterOutlined size={14} className="text-gray-500" />
+                        <span className="text-sm text-gray-500 mr-2">{t('bookmark.activeFilters')}:</span>
+                        {keyword && (
+                            <Tag closable onClose={() => { setKeyword(''); fetchBookmarks(1); }}>
+                                {t('bookmark.keyword')}: {keyword}
+                            </Tag>
+                        )}
+                        {selectedCategory && (
+                            <Tag closable onClose={() => { setSelectedCategory(undefined); fetchBookmarks(1); }}>
+                                {t('bookmark.category')}: {categories.find(c => c.id === selectedCategory)?.name}
+                            </Tag>
+                        )}
+                        {selectedTag && (
+                            <Tag closable onClose={() => { setSelectedTag(''); fetchBookmarks(1); }}>
+                                {t('bookmark.tag')}: {selectedTag}
+                            </Tag>
+                        )}
+                    </div>
+                )}
             </Card>
 
-            <div className="grid grid-cols-4 gap-6">
-                <div className="col-span-1">
-                    <Card title={t('bookmark.categories')} className="mb-4">
-                        <div className="space-y-2">
+            <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-3">
+                    <Card
+                        title={
+                            <div className="flex items-center gap-2">
+                                <FolderOpenOutlined />
+                                <span>{t('bookmark.categories')}</span>
+                                <span className="ml-auto text-xs text-gray-400">{categories.length}</span>
+                            </div>
+                        }
+                        className="mb-4"
+                        size="small"
+                    >
+                        <div className="space-y-1">
                             {categories.length === 0 ? (
-                                <p className="text-gray-400 text-sm">{t('bookmark.noCategories')}</p>
+                                <Empty
+                                    description={t('bookmark.noCategories')}
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                />
                             ) : (
                                 categories.map((cat) => (
                                     <div
                                         key={cat.id}
-                                        className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
+                                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${
                                             selectedCategory === cat.id
-                                                ? 'bg-blue-50 text-blue-600'
+                                                ? 'bg-blue-50 text-blue-600 border border-blue-200'
                                                 : 'hover:bg-gray-50'
                                         }`}
                                         onClick={() => {
                                             setSelectedCategory(selectedCategory === cat.id ? undefined : cat.id)
-                                            fetchBookmarks()
+                                            fetchBookmarks(1)
                                         }}
                                     >
-                                        <span>{cat.name}</span>
-                                        <div className="flex gap-1">
+                                        <span className="truncate">{cat.name}</span>
+                                        <div className="flex items-center gap-1 ml-2">
                                             <button
-                                                className="p-1 hover:text-blue-500"
+                                                className="p-1 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     handleEditCategory(cat)
                                                 }}
                                             >
-                                                <EditOutlined size={14} />
+                                                <EditOutlined size={12} />
                                             </button>
                                             <button
-                                                className="p-1 hover:text-red-500"
+                                                className="p-1 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     handleDeleteCategory(cat.id)
                                                 }}
                                             >
-                                                <DeleteOutlined size={14} />
+                                                <DeleteOutlined size={12} />
                                             </button>
                                         </div>
                                     </div>
@@ -525,7 +684,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                             )}
                         </div>
                         <Button
-                            type="text"
+                            type="dashed"
                             icon={<PlusOutlined />}
                             className="w-full mt-4"
                             onClick={handleAddCategory}
@@ -534,20 +693,32 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                         </Button>
                     </Card>
 
-                    <Card title={t('bookmark.tags')}>
+                    <Card
+                        title={
+                            <div className="flex items-center gap-2">
+                                <TagOutlined />
+                                <span>{t('bookmark.tags')}</span>
+                                <span className="ml-auto text-xs text-gray-400">{tags.length}</span>
+                            </div>
+                        }
+                        size="small"
+                    >
                         <div className="flex flex-wrap gap-2">
                             {tags.length === 0 ? (
-                                <p className="text-gray-400 text-sm">{t('bookmark.noTags')}</p>
+                                <Empty
+                                    description={t('bookmark.noTags')}
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                />
                             ) : (
                                 tags.map((tag) => (
                                     <Tag
                                         key={tag.id}
                                         color={tag.color}
                                         closable
-                                        className={`cursor-pointer ${selectedTag === tag.name ? 'ring-2 ring-offset-1' : ''}`}
+                                        className={`cursor-pointer transition-all ${selectedTag === tag.name ? 'ring-2 ring-offset-1' : ''}`}
                                         onClick={() => {
                                             setSelectedTag(selectedTag === tag.name ? '' : tag.name)
-                                            fetchBookmarks()
+                                            fetchBookmarks(1)
                                         }}
                                         onClose={(e: React.MouseEvent<HTMLElement>) => {
                                             e.preventDefault()
@@ -560,7 +731,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                             )}
                         </div>
                         <Button
-                            type="text"
+                            type="dashed"
                             icon={<PlusOutlined />}
                             className="w-full mt-4"
                             onClick={handleAddTag}
@@ -570,12 +741,17 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                     </Card>
                 </div>
 
-                <div className="col-span-3">
-                    <Card>
+                <div className="col-span-9">
+                    <Card size="small">
                         {bookmarks.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400">
-                                {t('bookmark.noBookmarks')}
-                            </div>
+                            <Empty
+                                description={hasActiveFilters ? t('bookmark.noSearchResults') : t('bookmark.addFirstBookmark')}
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            >
+                                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddBookmark}>
+                                    {t('bookmark.addBookmark')}
+                                </Button>
+                            </Empty>
                         ) : (
                             <Table
                                 columns={columns}
@@ -584,8 +760,13 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                                 rowKey="id"
                                 pagination={{
                                     total,
+                                    pageSizeOptions: ['10', '20', '50', '100'],
+                                    showSizeChanger: true,
+                                    showTotal: (total, range) => `${range[0]}-${range[1]} ${t('bookmark.of')} ${total}`,
                                     onChange: (page, pageSize) => fetchBookmarks(page, pageSize)
                                 }}
+                                scroll={{ x: 'max-content' }}
+                                className="custom-table"
                             />
                         )}
                     </Card>
@@ -597,6 +778,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 open={showBookmarkModal}
                 onCancel={() => setShowBookmarkModal(false)}
                 onOk={handleSaveBookmark}
+                width={520}
+                okText={t('common.confirm')}
+                cancelText={t('common.cancel')}
             >
                 <Form form={bookmarkForm} layout="vertical">
                     <Form.Item
@@ -604,16 +788,29 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                         label={t('bookmark.url')}
                         rules={[{ required: true, message: t('bookmark.enterUrl') }]}
                     >
-                        <Input placeholder={t('bookmark.enterUrl')} />
+                        <Input
+                            placeholder={t('bookmark.enterUrl')}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="title" label={t('bookmark.title')}>
-                        <Input placeholder={t('bookmark.enterTitle')} />
+                        <Input
+                            placeholder={t('bookmark.enterTitle')}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="description" label={t('bookmark.description')}>
-                        <Input.TextArea placeholder={t('bookmark.enterDescription')} rows={3} />
+                        <Input.TextArea
+                            placeholder={t('bookmark.enterDescription')}
+                            rows={3}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="categoryId" label={t('bookmark.category')}>
-                        <Select placeholder={t('bookmark.selectCategory')}>
+                        <Select
+                            placeholder={t('bookmark.selectCategory')}
+                            size="large"
+                        >
                             {categories.map((cat) => (
                                 <Option key={cat.id} value={cat.id}>{cat.name}</Option>
                             ))}
@@ -624,6 +821,7 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                             mode="tags"
                             tokenSeparators={[',', ' ']}
                             placeholder={t('bookmark.enterTags')}
+                            size="large"
                             style={{ width: '100%' }}
                         />
                     </Form.Item>
@@ -635,6 +833,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 open={showCategoryModal}
                 onCancel={() => setShowCategoryModal(false)}
                 onOk={handleSaveCategory}
+                width={420}
+                okText={t('common.confirm')}
+                cancelText={t('common.cancel')}
             >
                 <Form form={categoryForm} layout="vertical">
                     <Form.Item
@@ -642,13 +843,23 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                         label={t('bookmark.categoryName')}
                         rules={[{ required: true, message: t('bookmark.enterCategoryName') }]}
                     >
-                        <Input placeholder={t('bookmark.enterCategoryName')} />
+                        <Input
+                            placeholder={t('bookmark.enterCategoryName')}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="icon" label={t('bookmark.icon')}>
-                        <Input placeholder={t('bookmark.enterIcon')} />
+                        <Input
+                            placeholder={t('bookmark.enterIcon')}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="sortOrder" label={t('bookmark.sortOrder')}>
-                        <Input type="number" placeholder={t('bookmark.enterSortOrder')} />
+                        <Input
+                            type="number"
+                            placeholder={t('bookmark.enterSortOrder')}
+                            size="large"
+                        />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -658,6 +869,9 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                 open={showTagModal}
                 onCancel={() => setShowTagModal(false)}
                 onOk={handleSaveTag}
+                width={420}
+                okText={t('common.confirm')}
+                cancelText={t('common.cancel')}
             >
                 <Form form={tagForm} layout="vertical">
                     <Form.Item
@@ -665,10 +879,18 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
                         label={t('bookmark.tagName')}
                         rules={[{ required: true, message: t('bookmark.enterTagName') }]}
                     >
-                        <Input placeholder={t('bookmark.enterTagName')} />
+                        <Input
+                            placeholder={t('bookmark.enterTagName')}
+                            size="large"
+                        />
                     </Form.Item>
                     <Form.Item name="color" label={t('bookmark.color')}>
-                        <Input type="color" defaultValue="#1890ff" />
+                        <Input
+                            type="color"
+                            defaultValue="#1890ff"
+                            size="large"
+                            style={{ height: 40 }}
+                        />
                     </Form.Item>
                 </Form>
             </Modal>
