@@ -14,6 +14,7 @@ import taskDashboard from "./modules/taskDashboard";
 import habitFormation from "./modules/habitFormation";
 import emotionChat from "./modules/emotionChat";
 import bookmarkManager from "./modules/bookmarkManager";
+import mediaRecommend from "./modules/mediaRecommend";
 
 
 /**
@@ -40,6 +41,7 @@ const portalRouters: MenuRouteObject[] = [
     {...habitFormation},    // 习惯养成（知识卡片记忆）
     {...emotionChat},       // 情绪感知推荐模块
     {...bookmarkManager},   // 书签管理器
+    {...mediaRecommend},    // 影视书籍推荐清单
     {...system},            // 系统设置模块
     {...other},             // 其他模块
 ]
