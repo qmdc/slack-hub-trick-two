@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slack.slackjarservice.bookmarkmanager.dao.BookmarkCategoryDao">
+
+    <select id="selectByUserIdOrderBySort" resultType="com.slack.slackjarservice.bookmarkmanager.entity.BookmarkCategory">
+        SELECT * FROM bookmark_category WHERE user_id = #{userId} AND deleted = 0 ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+</mapper>

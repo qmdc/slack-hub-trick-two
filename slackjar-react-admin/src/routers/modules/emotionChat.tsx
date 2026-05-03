@@ -6,7 +6,9 @@ const emotionChat: MenuRouteObject = {
     path: "emotion-chat",
     label: "menu.emotionChat",
     icon: <MessageOutlined/>,
+    hidden: true,
     element: <EmotionChat/>
+
 }
 
 export default emotionChat;
