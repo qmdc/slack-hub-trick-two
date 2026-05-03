@@ -264,6 +264,8 @@
     "importSuccess": "导入成功",
     "importFailed": "导入失败，请确保文件格式正确",
     "exportSuccess": "导出成功",
-    "exportFailed": "导出失败"
+    "exportFailed": "导出失败",
+    "loadCategoriesFailed": "加载分类失败",
+    "loadTagsFailed": "加载标签失败"
   }
 }

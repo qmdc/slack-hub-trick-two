@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
     Layout,
     Card,
@@ -13,7 +13,6 @@ import {
     Popconfirm,
     message,
     Empty,
-    Result,
     Space
 } from 'antd'
 import {
@@ -65,6 +64,8 @@ interface BookmarkManagerProps {
 
 const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
     const { t } = useTranslation()
+    const isMounted = useRef(true)
+    
     const [bookmarks, setBookmarks] = useState<BookmarkDTO[]>([])
     const [categories, setCategories] = useState<BookmarkCategoryDTO[]>([])
     const [tags, setTags] = useState<BookmarkTagDTO[]>([])
@@ -133,22 +134,34 @@ const BookmarkManager: React.FC<BookmarkManagerProps> = () => {
     const fetchCategories = useCallback(async () => {
         try {
             const res = await listCategories()
-            if (res.code === 200 && res.data) {
+            console.log('Fetch categories response:', res)
+            if (isMounted.current && res.code === 200 && res.data) {
                 setCategories(res.data)
+                console.log('Categories updated:', res.data)
             }
         } catch (error) {
             console.error('Failed to fetch categories', error)
+            message.error(t('bookmark.loadCategoriesFailed'))
         }
-    }, [])
+    }, [t])
 
     const fetchTags = useCallback(async () => {
         try {
             const res = await listTags()
-            if (res.code === 200 && res.data) {
+            console.log('Fetch tags response:', res)
+            if (isMounted.current && res.code === 200 && res.data) {
                 setTags(res.data)
+                console.log('Tags updated:', res.data)
             }
         } catch (error) {
             console.error('Failed to fetch tags', error)
+            message.error(t('bookmark.loadTagsFailed'))
+        }
+    }, [t])
+
+    useEffect(() => {
+        return () => {
+            isMounted.current = false
         }
     }, [])
 
