@@ -251,6 +251,19 @@
     "confirmDelete": "确定要删除这个书签吗？",
     "noBookmarks": "暂无书签",
     "noCategories": "暂无分类",
-    "noTags": "暂无标签"
+    "noTags": "暂无标签",
+    "searchSuccess": "搜索成功，共找到 {{count}} 条结果",
+    "noSearchResults": "未找到匹配的书签",
+    "addFirstBookmark": "点击下方按钮添加您的第一个书签",
+    "searchCount": "当前显示 {{count}} 条，共 {{total}} 条",
+    "activeFilters": "已应用筛选",
+    "clearFilters": "清除筛选",
+    "keyword": "关键词",
+    "tag": "标签",
+    "of": "共",
+    "importSuccess": "导入成功",
+    "importFailed": "导入失败，请确保文件格式正确",
+    "exportSuccess": "导出成功",
+    "exportFailed": "导出失败"
   }
 }
